@@ -4,15 +4,3 @@ updates:
   directory: "/"
   schedule:
     interval: "daily"
-- package-ecosystem: "cargo"
-  directory: "internal/sallyport"
-  schedule:
-    interval: "daily"
-- package-ecosystem: "cargo"
-  directory: "internal/shim-sev"
-  schedule:
-    interval: "daily"
-- package-ecosystem: "cargo"
-  directory: "internal/shim-sgx"
-  schedule:
-    interval: "daily"

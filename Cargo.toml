@@ -1,80 +1,39 @@
 [package]
-name = "enarx-keepldr"
+name = "enarx-shim-sgx"
 version = "0.1.0"
 authors = ["Nathaniel McCallum <npmccallum@redhat.com>"]
-license = "Apache-2.0"
 edition = "2018"
-build = "build.rs"
-homepage = "https://github.com/enarx/enarx-keepldr"
-repository = "https://github.com/enarx/enarx-keepldr"
-description = "Enarx Keep Loader"
-readme = "README.md"
-keywords = ["sgx", "sev", "kvm", "tee"]
-categories = ["os", "os::linux-apis", "network-programming", "hardware-support"]
-exclude = [ ".gitignore", ".github/*" ]
-include = [ "src", "internal" ]
+license = "Apache-2.0"
 
-[badges]
-# See https://doc.rust-lang.org/cargo/reference/manifest.html#the-badges-section
-github = { repository = "enarx/enarx-keepldr", workflow = "test" }
-#github = { repository = "enarx/enarx-keepldr", workflow = "lint" }
-maintenance = { status = "actively-developed" }
-is-it-maintained-issue-resolution = { repository = "enarx/enarx-keepldr" }
-is-it-maintained-open-issues = { repository = "enarx/enarx-keepldr" }
-
-[features]
-default = ["backend-sev"]
-
-backend-nil = []
-backend-kvm = ["x86_64", "kvm-bindings", "kvm-ioctls"]
-backend-sev = ["sev", "backend-kvm", "koine"]
-backend-sgx = ["sgx"]
+[[bin]]
+name = "enarx-shim-sgx"
+path = "src/main.rs"
+test = false
 
 [dependencies]
+enarx-heap = { git = "https://github.com/enarx/enarx-heap", rev = "6ecf48aa3db78a0cc17f32870c52446dba30f376" }
 sallyport = { git = "https://github.com/enarx/sallyport", rev = "efccf0f" }
-sev = { version = "0.1", features = ["openssl"], optional = true }
-sgx = { git = "https://github.com/enarx/sgx", rev = "4bb50e55bc8717c5bc2a98d680bf1be436cda8de", features = ["asm", "crypto"], optional = true }
-koine = { git = "https://github.com/enarx/koine", optional = true }
-x86_64 = { version = "0.11", default-features = false, features = ["stable"], optional = true }
-kvm-bindings = { version = "0.4", optional = true }
-kvm-ioctls = { version = "0.9", optional = true }
+rcrt1 = { git = "https://github.com/enarx/rcrt1", rev = "2205dc7" }
+compiler_builtins = { version = "0.1", default-features = false, features = [ "mem" ] }
+sgx = { git = "https://github.com/enarx/sgx", rev = "4bb50e55bc8717c5bc2a98d680bf1be436cda8de", features = [ "asm" ] }
+goblin = { version = "0.4", default-features = false, features = [ "elf64" ] }
+crt0stack = { version = "0.1", default-features = false }
+libc = { version = "0.2", default-features = false }
 primordial = "0.1"
-structopt = "0.3"
-iocuddle = "0.1"
-ciborium = "0.1"
-colorful = "0.2"
-mmarinus = "0.2"
 nbytes = "0.1"
-anyhow = "1.0"
-goblin = "0.4"
-libc = "0.2"
 lset = "0.1"
-protobuf = "2.22"
-openssl = "0.10"
+xsave = "0.1.1"
+const-default = { version = "0.1" }
 
-[build-dependencies]
-cc = "1.0"
-walkdir = "2"
-protobuf-codegen-pure = "2.22"
-sallyport = { git = "https://github.com/enarx/sallyport", rev = "efccf0f" }
+[profile.dev.package.rcrt1]
+opt-level = 3
 
-[dev-dependencies]
-process_control = "3.0"
-serial_test = "0.5"
-tempdir = "0.3.7"
+[profile.dev]
+panic = "abort"
 
-[[example]]
-name="echo"
-path="tests/bin/echo.rs"
-
-[[example]]
-name="memory_stress_test"
-path="tests/bin/memory_stress_test.rs"
-
-[[example]]
-name="memspike"
-path="tests/bin/memspike.rs"
-
-[[example]]
-name="unix_echo"
-path="tests/bin/unix_echo.rs"
+[profile.release]
+panic = "abort"
+codegen-units = 1
+incremental = false
+lto = true
+opt-level = "s"

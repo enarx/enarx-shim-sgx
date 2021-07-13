@@ -2,7 +2,7 @@ on: [push, pull_request]
 name: lint
 jobs:
   fmt:
-    name: cargo fmt (${{ matrix.crate.name }})
+    name: cargo fmt
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -15,79 +15,23 @@ jobs:
       - uses: actions-rs/cargo@v1
         with:
           command: fmt
-          args: --manifest-path=${{ matrix.crate.path }} -- --check
-    strategy:
-      fail-fast: false
-      matrix:
-        crate:
-          - {name: enarx-keepldr, path: Cargo.toml}
-          - {name: shim-sgx, path: internal/shim-sgx/Cargo.toml}
-          - {name: shim-sev, path: internal/shim-sev/Cargo.toml}
+          args: --all -- --check
 
   clippy:
-    name: cargo clippy (${{ matrix.crate.name }})
-    runs-on: ubuntu-20.04
+    name: cargo clippy
+    runs-on: ubuntu-latest
     steps:
-      - run: sudo apt update
-      - run: sudo apt install -y musl-tools
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
         with:
           components: clippy
           toolchain: nightly
           profile: minimal
-          target: x86_64-unknown-linux-musl
           override: true
       - uses: actions-rs/cargo@v1
         with:
           command: clippy
-          args: ${{ matrix.crate.target }} --all-features --manifest-path=${{ matrix.crate.path }} -- -D warnings
-    strategy:
-      fail-fast: false
-      matrix:
-        crate:
-          - {name: enarx-keepldr, path: Cargo.toml}
-          - name: shim-sgx
-            path: internal/shim-sgx/Cargo.toml
-            target: --target=x86_64-unknown-linux-musl
-          - name: shim-sev
-            path: internal/shim-sev/Cargo.toml
-            target: --target=x86_64-unknown-linux-musl
-
-  clippy-single-backends:
-    name: cargo clippy (enarx-keepldr ${{ matrix.backend.name }} ${{ matrix.profile.name }})
-    runs-on: ubuntu-20.04
-    steps:
-      - run: sudo apt update
-      - run: sudo apt install -y musl-tools
-      - uses: actions/checkout@v2
-      - uses: actions-rs/toolchain@v1
-        with:
-          components: clippy
-          toolchain: nightly
-          profile: minimal
-          target: x86_64-unknown-linux-musl
-          override: true
-      - uses: actions-rs/cargo@v1
-        with:
-          command: clippy
-          args: ${{ matrix.profile.flag }} --no-default-features --features=backend-${{ matrix.backend.name }} -- -D warnings
-      - uses: actions-rs/cargo@v1
-        with:
-          command: clippy
-          args: ${{ matrix.profile.flag }} --no-default-features --features=backend-${{ matrix.backend.name }} --examples -- -D warnings
-    strategy:
-      fail-fast: false
-      matrix:
-        backend:
-          - {name: sev, host: [self-hosted, linux, sev]}
-          - {name: sgx, host: [self-hosted, linux, sgx]}
-          - {name: kvm, host: [self-hosted, linux]}
-          - {name: nil, host: ubuntu-20.04}
-        profile:
-          - name: debug
-          - name: release
-            flag: --release
+          args: -- -D warnings
 
   readme:
     name: cargo readme
@@ -102,18 +46,14 @@ jobs:
       - run: cargo install cargo-readme
       - run: cargo readme > README.md && git diff --exit-code
 
-  deny:
-    name: cargo deny
+  check-spdx-headers:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: EmbarkStudios/cargo-deny-action@v1
-        with:
-          arguments: --manifest-path=${{ matrix.crate.path }}
-    strategy:
-      fail-fast: false
-      matrix:
-        crate:
-          - {name: enarx-keepldr, path: ./Cargo.toml}
-          - {name: shim-sgx, path: internal/shim-sgx/Cargo.toml}
-          - {name: shim-sev, path: internal/shim-sev/Cargo.toml}
+    - name: checkout
+      uses: actions/checkout@v2
+    - uses: enarx/spdx@master
+      with:
+        licenses: >
+          {
+            \"rs\": [\"Apache-2.0\"]
+          }
