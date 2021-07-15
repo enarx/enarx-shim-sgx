@@ -53,7 +53,4 @@ jobs:
       uses: actions/checkout@v2
     - uses: enarx/spdx@master
       with:
-        licenses: >
-          {
-            \"rs\": [\"Apache-2.0\"]
-          }
+        licenses: Apache-2.0
