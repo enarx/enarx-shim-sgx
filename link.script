@@ -1,0 +1,58 @@
+ENTRY(_start)
+
+PHDRS {
+  preamble PT_LOAD FILEHDR PHDRS;
+  text PT_LOAD;
+  rodata PT_LOAD;
+  data PT_LOAD;
+
+  dynamic PT_DYNAMIC;
+  note PT_NOTE;
+
+  frame 0x6474e550;          /* GNU_EH_FRAME */
+  stack 0x6474e551 FLAGS(6); /* GNU_STACK */
+  relro 0x6474e552 FLAGS(4); /* GNU_RELRO */
+}
+
+SECTIONS {
+  . = SIZEOF_HEADERS;
+
+  . = ALIGN(CONSTANT(MAXPAGESIZE));
+  .interp             : { *(.interp) } :preamble
+  .note.gnu.build-id  : { *(.note.gnu.build-id) } :preamble :note
+  .hash               : { *(.hash) } :preamble
+  .gnu.hash           : { *(.gnu.hash) } :preamble
+  .dynsym             : { *(.dynsym) } :preamble
+  .dynstr             : { *(.dynstr) } :preamble
+  .gnu.version        : { *(.gnu.version) } :preamble
+  .gnu.version_d      : { *(.gnu.version_d) } :preamble
+  .gnu.version_r      : { *(.gnu.version_r) } :preamble
+  .rela.dyn           : { *(.rela.*) } :preamble
+  .rela.plt           : { *(.rela.plt) *(.rela.iplt) } :preamble
+
+  . = ALIGN(CONSTANT(MAXPAGESIZE));
+  .init               : { KEEP (*(SORT_NONE(.init))) } :text
+  .fini               : { KEEP (*(SORT_NONE(.fini))) } :text
+  .text               : { *(.text .text.*) } :text
+  .plt                : { *(.plt) *(.iplt) } :text
+  .plt.got            : { *(.plt.got) } :text
+  .plt.sec            : { *(.plt.sec) } :text
+
+  . = ALIGN(CONSTANT(MAXPAGESIZE));
+  .rodata             : { *(.rodata .rodata.*) } :rodata
+  .rodata1            : { *(.rodata1) } :rodata
+  .eh_frame_hdr       : { *(.eh_frame_hdr) *(.eh_frame_entry .eh_frame_entry.*) } :rodata :frame
+  .eh_frame           : ONLY_IF_RO { KEEP (*(.eh_frame)) *(.eh_frame.*) } :rodata
+
+  . = ALIGN(CONSTANT(MAXPAGESIZE));
+  .data.rel.ro        : { *(.data.rel.ro .data.rel.ro.*) } :data :relro
+  .dynamic            : { *(.dynamic) } :data :relro :dynamic
+  .got                : { *(.got) } :data :relro
+  .got.plt            : { *(.got.plt) } :data :relro
+
+  . = ALIGN(CONSTANT(MAXPAGESIZE)); /* Align here? New section? */
+  .eh_frame           : ONLY_IF_RW { KEEP (*(.eh_frame)) *(.eh_frame.*) } :data
+  .data               : { *(.data .data.*) } :data
+  .data1              : { *(.data1) } :data
+  .bss                : { *(.bss .bss.*) } :data
+}

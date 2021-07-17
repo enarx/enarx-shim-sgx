@@ -10,6 +10,8 @@ jobs:
         with:
           toolchain: ${{ matrix.toolchain }}
           override: true
+      - name: Install lld
+        run: sudo apt install lld
       - uses: actions-rs/cargo@v1
         with:
           command: build
