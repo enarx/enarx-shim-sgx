@@ -4,4 +4,10 @@ rustflags = [
     "-C", "relocation-model=pic",
     "-C", "link-args=-Wl,--sort-section=alignment -nostartfiles",
     "-C", "link-self-contained=no",
+    "-C", "link-arg=-Tlink.script",
+
+    # Using GNU ld on Fedora 34 produces this assertion:
+    #  = note: /usr/bin/ld: BFD version 2.35.2-3.fc34 assertion fail elf.c:6278
+    #          collect2: error: ld returned 1 exit status
+    "-C", "link-arg=-fuse-ld=lld",
 ]
