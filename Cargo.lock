@@ -52,7 +52,7 @@ version = "0.1.0"
 source = "git+https://github.com/enarx/enarx-heap?rev=6ecf48aa3db78a0cc17f32870c52446dba30f376#6ecf48aa3db78a0cc17f32870c52446dba30f376"
 dependencies = [
  "libc",
- "lset",
+ "lset 0.1.0",
  "primordial",
 ]
 
@@ -66,7 +66,7 @@ dependencies = [
  "enarx-heap",
  "goblin 0.4.2",
  "libc",
- "lset",
+ "lset 0.2.0",
  "nbytes",
  "primordial",
  "rcrt1",
@@ -106,6 +106,12 @@ name = "lset"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "23b20ea162e8026b8fc058e49bbc77ad7dd48d1907b3de206ecbe549c7ce669a"
+
+[[package]]
+name = "lset"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "efeae5282702b072b5e21cf8f430ccd3c5031c1e346321a28429523266c4a9b0"
 
 [[package]]
 name = "nbytes"
@@ -174,7 +180,7 @@ source = "git+https://github.com/enarx/sgx?rev=4bb50e55bc8717c5bc2a98d680bf1be43
 dependencies = [
  "bitflags",
  "cc",
- "lset",
+ "lset 0.1.0",
  "primordial",
  "xsave",
 ]
