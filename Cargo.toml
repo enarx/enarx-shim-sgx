@@ -23,7 +23,7 @@ primordial = "0.1"
 nbytes = "0.1"
 lset = "0.1"
 xsave = "0.1.1"
-const-default = { version = "0.1" }
+const-default = { version = "1.0" }
 
 [profile.dev.package.rcrt1]
 opt-level = 3
